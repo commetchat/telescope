@@ -7,19 +7,50 @@ import worker from "../src/index";
 // `Request` to pass to `worker.fetch()`.
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
-describe("Hello World worker", () => {
-  it("responds with Hello World! (unit style)", async () => {
+
+const serverKeyPair = await crypto.subtle.generateKey(
+	{
+		name: "RSA-OAEP",
+		modulusLength: 4096,
+		publicExponent: new Uint8Array([1, 0, 1]),
+		hash: "SHA-256"
+	},
+	true,
+	["encrypt", "decrypt"]
+);
+
+const clientKeyPair = await crypto.subtle.generateKey(
+	{
+		name: "RSA-OAEP",
+		modulusLength: 4096,
+		publicExponent: new Uint8Array([1, 0, 1]),
+		hash: "SHA-256"
+	},
+	true,
+	["encrypt", "decrypt", "sign"]
+	);
+
+const maliciousKeyPair = await crypto.subtle.generateKey(
+		{
+			name: "RSA-OAEP",
+			modulusLength: 4096,
+			publicExponent: new Uint8Array([1, 0, 1]),
+			hash: "SHA-256"
+		},
+		true,
+		["encrypt", "decrypt"]
+	);
+
+describe("Basic tests", () => {
+  it("responds with not found", async () => {
     const request = new IncomingRequest("http://example.com");
-    // Create an empty context to pass to `worker.fetch()`.
+
     const ctx = createExecutionContext();
-    const response = await worker.fetch(request, env, ctx);
-    // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
+    const response = await worker.fetch(request, (env as any), ctx);
+
     await waitOnExecutionContext(ctx);
-    expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
+    expect(await response.text()).toMatchInlineSnapshot(`"Not found"`);
   });
 
-  it("responds with Hello World! (integration style)", async () => {
-    const response = await SELF.fetch("https://example.com");
-    expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
- });
+
 });
