@@ -13,6 +13,7 @@ import router from "./router";
 export interface Env {
 	ENCRYPTED_PREVIEW_PUBLIC_KEY_B64: string
 	ENCRYPTED_PREVIEW_PRIVATE_KEY_B64: string
+	YOUTUBE_DATA_API_KEY: string
 }
 
 const corsHeaders: Record<string, string> = {
@@ -56,21 +57,19 @@ function handleOptions(request: Request) {
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		console.log("Got request!")
 		let response: Response
 		if (request.method === "OPTIONS") {
 			response = handleOptions(request);
-			console.log("Handling options")
 		} else {
-			console.log("Routing")
-			response = await router.fetch(request, env);
-			console.log("Got response: ")
-			console.log(response)
+			try {
+				response = await router.fetch(request, env);
+			} catch {
+				response = new Response("Server Error", { status: 500 })
+			}
 			response = new Response(response.body, response)
 			response.headers.set("Access-Control-Allow-Origin", "*")
 			response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		}
-
 		return response;
 	},
 };

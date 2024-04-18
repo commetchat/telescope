@@ -1,34 +1,49 @@
+import { Env } from "..";
+import { handleSpecialCases } from "../known_apis/apis";
+
 export { extractTags }
 
-async function extractTags(url: URL): Promise<{ [key: string]: string }> {
-    var response = await fetch(new URL(url))
 
-    const tags: { [key: string]: string } = {};
+async function extractTags(url: URL, env: Env): Promise<{ [key: string]: string }> {
+	try {
+		var specialCaseResults = await handleSpecialCases(url, env);
+		if (Object.keys(specialCaseResults).length != 0) {
+			return specialCaseResults;
+		}
+	} catch { }
 
-    const rewriter = new HTMLRewriter()
-        .on("meta", {
-            element(el) {
-                var prop = el.getAttribute("property")
-                var content = el.getAttribute("content")
+	var response = await fetch(new URL(url))
 
-                if (prop == null || content == null) {
-                    return
-                }
+	if (response.status != 200) {
+		throw "Website did not respond properly"
+	}
 
-                if (["og:site_name", "og:url", "og:title", "og:description", "og:image"].includes(prop) == false) {
-                    return
-                }
+	const tags: { [key: string]: string } = {};
 
-                tags[prop] = content
-            }
-        })
+	const rewriter = new HTMLRewriter()
+		.on("meta", {
+			element(el) {
+				var prop = el.getAttribute("property")
+				var content = el.getAttribute("content")
 
-    await consume(rewriter.transform(response).body!)
+				if (prop == null || content == null) {
+					return
+				}
 
-    return tags
+				if (["og:site_name", "og:url", "og:title", "og:description", "og:image"].includes(prop) == false) {
+					return
+				}
+
+				tags[prop] = content
+			}
+		})
+
+	await consume(rewriter.transform(response as any).body!)
+
+	return tags
 }
 
 async function consume(stream: ReadableStream) {
-    const reader = stream.getReader();
-    while (!(await reader.read()).done) { /* NOOP */ }
+	const reader = stream.getReader();
+	while (!(await reader.read()).done) { /* NOOP */ }
 }
