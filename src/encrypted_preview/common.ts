@@ -4,22 +4,22 @@ import { Env } from '..';
 import base_64 from '../utils/base_64';
 
 export {
-    decodeAndDecryptContentKey, loadServerPrivateKey, decodeAndDecryptString, encryptContent, encryptAndEncodeContentString
+	decodeAndDecryptContentKey, loadServerPrivateKey, decodeAndDecryptString, encryptContent, encryptAndEncodeContentString
 }
 
 async function decodeAndDecryptContentKey(encryptedContentKey: string, env: Env): Promise<CryptoKey> {
 	var decoded = decodeURIComponent(encryptedContentKey)
-    var data = b64.base64ToArrayBuffer(decoded)
+	var data = b64.base64ToArrayBuffer(decoded)
 
 	var key = await loadServerPrivateKey(env)
 
 	var decrypted = await crypto.subtle.decrypt({
-        name: "RSA-OAEP",
-    }, key, data)
+		name: "RSA-OAEP",
+	}, key, data)
 
 	var d = new Uint8Array(decrypted);
 
-	for(var i in d) {
+	for (var i in d) {
 		console.log(d[i])
 	}
 
@@ -37,7 +37,7 @@ async function decodeAndDecryptContentKey(encryptedContentKey: string, env: Env)
 async function decodeAndDecryptString(data: string, key: CryptoKey): Promise<string> {
 	console.log(data);
 	var decoded = decodeURIComponent(data)
-    var encryptedData = b64.base64ToArrayBuffer(decoded)
+	var encryptedData = b64.base64ToArrayBuffer(decoded)
 
 	var content = await decryptContent(encryptedData, key)
 
@@ -58,15 +58,15 @@ async function decryptContent(data: ArrayBuffer, key: CryptoKey): Promise<ArrayB
 }
 
 async function encryptContent(content: Uint8Array, contentKey: CryptoKey): Promise<ArrayBuffer> {
-    const iv = crypto.getRandomValues(new Uint8Array(16));
+	const iv = crypto.getRandomValues(new Uint8Array(16));
 
-    var encrypted = await crypto.subtle.encrypt({
-        name: "AES-CBC",
-        iv: iv,
-    }, contentKey, content)
+	var encrypted = await crypto.subtle.encrypt({
+		name: "AES-CBC",
+		iv: iv,
+	}, contentKey, content)
 
-    var result = a.joinArray(iv, new Uint8Array(encrypted))
-    return result;
+	var result = a.joinArray(iv, new Uint8Array(encrypted))
+	return result;
 }
 
 async function encryptAndEncodeContentString(content: string, contentKey: CryptoKey): Promise<string> {
@@ -77,37 +77,37 @@ async function encryptAndEncodeContentString(content: string, contentKey: Crypto
 
 
 async function loadServerPrivateKey(env: Env): Promise<CryptoKey> {
-    var privateKeyB64 = env.ENCRYPTED_PREVIEW_PRIVATE_KEY_B64
-    var key = new TextDecoder().decode(b64.base64ToArrayBuffer(privateKeyB64))
+	var privateKeyB64 = env.ENCRYPTED_PREVIEW_PRIVATE_KEY_B64
+	var key = new TextDecoder().decode(b64.base64ToArrayBuffer(privateKeyB64))
 
-    var privateKey = privateKeyPemToCryptoKey(key);
-    return privateKey;
+	var privateKey = privateKeyPemToCryptoKey(key);
+	return privateKey;
 }
 
 function privateKeyPemToCryptoKey(pem: String): Promise<CryptoKey> {
-    pem = pem.replace(/[\n\r]/g, '');
+	pem = pem.replace(/[\n\r]/g, '');
 
-    // fetch the part of the PEM string between header and footer
-    const pemHeader = "-----BEGIN PRIVATE KEY-----";
-    const pemFooter = "-----END PRIVATE KEY-----";
-    const pemContents = pem.substring(
-        pemHeader.length,
-        pem.length - pemFooter.length - 1,
-    );
-    // base64 decode the string to get the binary data
-    const binaryDerString = atob(pemContents);
-    // convert from a binary string to an ArrayBuffer
-    const binaryDer = b64.stringToArrayBuffer(binaryDerString);
+	// fetch the part of the PEM string between header and footer
+	const pemHeader = "-----BEGIN PRIVATE KEY-----";
+	const pemFooter = "-----END PRIVATE KEY-----";
+	const pemContents = pem.substring(
+		pemHeader.length,
+		pem.length - pemFooter.length - 1,
+	);
+	// base64 decode the string to get the binary data
+	const binaryDerString = atob(pemContents);
+	// convert from a binary string to an ArrayBuffer
+	const binaryDer = b64.stringToArrayBuffer(binaryDerString);
 
-    return crypto.subtle.importKey(
-        "pkcs8",
-        binaryDer,
-        {
-            name: "RSA-OAEP",
-            hash: { name: "SHA-256" }
-        },
-        true,
-        ["decrypt"],
-    );
+	return crypto.subtle.importKey(
+		"pkcs8",
+		binaryDer,
+		{
+			name: "RSA-OAEP",
+			hash: { name: "SHA-256" }
+		},
+		true,
+		["decrypt"],
+	);
 }
 

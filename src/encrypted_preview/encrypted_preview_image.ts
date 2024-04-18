@@ -13,21 +13,21 @@ async function encryptedPreviewImage(params: { [key: string]: string }, query: {
 	console.log("Got decrypted image url: ")
 	console.log(decryptedUrl)
 
-    var response = await fetch(new URL(decryptedUrl))
-	if(response.status != 200) {
-		return new Response("Something went wrong", {status: response.status})
+	var response = await fetch(new URL(decryptedUrl))
+	if (response.status != 200) {
+		return new Response("Something went wrong", { status: response.status })
 	}
 
 	var type = response.headers.get("Content-Type")
-    var imageBytes = await response.arrayBuffer();
+	var imageBytes = await response.arrayBuffer();
 
-    var encryptedImage = new Uint8Array(await encryptContent(new Uint8Array(imageBytes), contentKey))
+	var encryptedImage = new Uint8Array(await encryptContent(new Uint8Array(imageBytes), contentKey))
 
-    var finalResponse = new Response(encryptedImage);
+	var finalResponse = new Response(encryptedImage);
 
-    if (type != null) {
-        finalResponse.headers.set('Content-Type', type)
-    }
+	if (type != null) {
+		finalResponse.headers.set('Content-Type', type)
+	}
 
-    return finalResponse
+	return finalResponse
 }
