@@ -60,7 +60,11 @@ export default {
 		if (request.method === "OPTIONS") {
 			response = handleOptions(request);
 		} else {
-			response = await router.fetch(request, env);
+			try {
+				response = await router.fetch(request, env);
+			} catch {
+				response = new Response("Server Error", { status: 500 })
+			}
 			response = new Response(response.body, response)
 			response.headers.set("Access-Control-Allow-Origin", "*")
 			response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
