@@ -7,11 +7,8 @@ export { encryptedPreviewImage }
 async function encryptedPreviewImage(params: { [key: string]: string }, query: { [key: string]: string }, env: Env) {
 
 	var contentKey = await decodeAndDecryptContentKey(params['encryptedContentKey'], env)
-	console.log(contentKey)
-	var decryptedUrl = await decodeAndDecryptString(params['encryptedUrl'], contentKey);
 
-	console.log("Got decrypted image url: ")
-	console.log(decryptedUrl)
+	var decryptedUrl = await decodeAndDecryptString(params['encryptedUrl'], contentKey);
 
 	var response = await fetch(new URL(decryptedUrl))
 	if (response.status != 200) {

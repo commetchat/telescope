@@ -56,21 +56,15 @@ function handleOptions(request: Request) {
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		console.log("Got request!")
 		let response: Response
 		if (request.method === "OPTIONS") {
 			response = handleOptions(request);
-			console.log("Handling options")
 		} else {
-			console.log("Routing")
 			response = await router.fetch(request, env);
-			console.log("Got response: ")
-			console.log(response)
 			response = new Response(response.body, response)
 			response.headers.set("Access-Control-Allow-Origin", "*")
 			response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		}
-
 		return response;
 	},
 };

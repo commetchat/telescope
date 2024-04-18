@@ -17,12 +17,6 @@ async function decodeAndDecryptContentKey(encryptedContentKey: string, env: Env)
 		name: "RSA-OAEP",
 	}, key, data)
 
-	var d = new Uint8Array(decrypted);
-
-	for (var i in d) {
-		console.log(d[i])
-	}
-
 	var aesKey = await crypto.subtle.importKey(
 		"raw",
 		decrypted,
@@ -35,7 +29,6 @@ async function decodeAndDecryptContentKey(encryptedContentKey: string, env: Env)
 }
 
 async function decodeAndDecryptString(data: string, key: CryptoKey): Promise<string> {
-	console.log(data);
 	var decoded = decodeURIComponent(data)
 	var encryptedData = b64.base64ToArrayBuffer(decoded)
 

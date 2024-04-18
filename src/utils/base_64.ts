@@ -26,12 +26,7 @@ export default {
 			bufView[i] = str.charCodeAt(i);
 		}
 
-		console.log(buf)
-
 		var second = new TextEncoder().encode(str).buffer
-		console.log(second)
-		console.log("^^^^^^^")
 		return buf;
-
 	}
 }

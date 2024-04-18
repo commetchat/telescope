@@ -1,7 +1,6 @@
 export { extractTags }
 
 async function extractTags(url: URL): Promise<{ [key: string]: string }> {
-	var response = await fetch(new URL(url))
 
 	const tags: { [key: string]: string } = {};
 
@@ -23,7 +22,8 @@ async function extractTags(url: URL): Promise<{ [key: string]: string }> {
 			}
 		})
 
-	await consume(rewriter.transform(response).body!)
+	var response = await fetch(new URL(url))
+	await consume(rewriter.transform(response as any).body!)
 
 	return tags
 }
