@@ -1,6 +1,22 @@
+import { Env } from "..";
+import { handleSpecialCases } from "../known_apis/apis";
+
 export { extractTags }
 
-async function extractTags(url: URL): Promise<{ [key: string]: string }> {
+
+async function extractTags(url: URL, env: Env): Promise<{ [key: string]: string }> {
+	try {
+		var specialCaseResults = await handleSpecialCases(url, env);
+		if (Object.keys(specialCaseResults).length != 0) {
+			return specialCaseResults;
+		}
+	} catch { }
+
+	var response = await fetch(new URL(url))
+
+	if (response.status != 200) {
+		throw "Website did not respond properly"
+	}
 
 	const tags: { [key: string]: string } = {};
 
@@ -22,7 +38,6 @@ async function extractTags(url: URL): Promise<{ [key: string]: string }> {
 			}
 		})
 
-	var response = await fetch(new URL(url))
 	await consume(rewriter.transform(response as any).body!)
 
 	return tags

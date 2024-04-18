@@ -13,6 +13,7 @@ import router from "./router";
 export interface Env {
 	ENCRYPTED_PREVIEW_PUBLIC_KEY_B64: string
 	ENCRYPTED_PREVIEW_PRIVATE_KEY_B64: string
+	YOUTUBE_DATA_API_KEY: string
 }
 
 const corsHeaders: Record<string, string> = {

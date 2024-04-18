@@ -9,9 +9,9 @@ export { encryptedPreview }
 async function encryptedPreview(params: { [key: string]: string }, query: { [key: string]: string }, url: string, env: Env) {
 
 	var contentKey = await decodeAndDecryptContentKey(params['encryptedContentKey'], env)
-
 	var decryptedUrl = await decodeAndDecryptString(params['encryptedUrl'], contentKey);
-	var tags = await extractTags(new URL(decryptedUrl))
+
+	var tags = await extractTags(new URL(decryptedUrl), env)
 
 	var imageUrl = tags["og:image"]
 	if (imageUrl != null) {
