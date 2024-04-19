@@ -57,7 +57,8 @@ async function youtubeVideo(id: string, env: Env): Promise<{ [key: string]: stri
 	var previewData = {
 		"og:site_name": "YouTube",
 		"og:title": data["title"],
-		"og:image": thumbnail["url"]
+		"og:image": thumbnail["url"],
+		"og:description": data["description"],
 	}
 
 	return previewData
