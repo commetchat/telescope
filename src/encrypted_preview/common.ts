@@ -62,11 +62,29 @@ async function encryptContent(content: Uint8Array, contentKey: CryptoKey): Promi
 	return result;
 }
 
-async function encryptAndEncodeContentString(content: string, contentKey: CryptoKey): Promise<string> {
-	var bytes = new TextEncoder().encode(content);
-	var encrypted = await encryptContent(bytes, contentKey);
-	var b64 = base_64.arrayBufferToBase64(encrypted)
-	return encodeURIComponent(b64)
+async function encryptAndEncodeContentString(content: string, contentKey: CryptoKey): Promise<any> {
+
+	// Synapse seems to trim text to 500 characters, so make sure everything fits in!
+	for (var i = 400; i > 50; i -= 50) {
+		if (content.length > i) {
+			content = content.substring(0, i) + "…"
+		}
+
+		var bytes = new TextEncoder().encode(content);
+
+
+		var encrypted = await encryptContent(bytes, contentKey);
+		var b64 = base_64.arrayBufferToBase64(encrypted)
+
+		var result = encodeURIComponent(b64);
+		if (result.length > 500) {
+			continue;
+		}
+
+		return result
+	}
+
+	return undefined;
 }
 
 
