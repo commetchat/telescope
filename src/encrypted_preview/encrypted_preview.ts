@@ -17,7 +17,6 @@ async function encryptedPreview(params: { [key: string]: string }, query: { [key
 	if (imageUrl != null) {
 		var thisUrl = new URL(url);
 		var encryptedImageUrl = await encryptAndEncodeContentString(imageUrl, contentKey)
-		encryptedImageUrl = encodeURIComponent(encryptedImageUrl);
 		thisUrl.pathname = `/url_preview/encrypted/image/${params['encryptedContentKey']}/${encryptedImageUrl}`
 		imageUrl = thisUrl.toString()
 	}

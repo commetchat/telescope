@@ -65,7 +65,8 @@ async function encryptContent(content: Uint8Array, contentKey: CryptoKey): Promi
 async function encryptAndEncodeContentString(content: string, contentKey: CryptoKey): Promise<string> {
 	var bytes = new TextEncoder().encode(content);
 	var encrypted = await encryptContent(bytes, contentKey);
-	return base_64.arrayBufferToBase64(encrypted)
+	var b64 = base_64.arrayBufferToBase64(encrypted)
+	return encodeURIComponent(b64)
 }
 
 
